@@ -2,7 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
 
-router.get("/", async (req, res) => {
+//Private Route Middleware
+const verify = require("./verifyToken")
+
+router.get("/all", verify ,async (req, res) => {
   try {
     const posts = await Post.find({ title: { $exists: true } }).limit();
     res.json(posts);
