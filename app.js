@@ -9,15 +9,12 @@ app.use(express.json());
 //Import routes
 const postsRouter = require("./routers/posts")
 const authRouter = require("./routers/auth")
+const eventRouter = require("./routers/events")
 
 //Middlewares
 app.use("/api/posts", postsRouter) //router middleware
 app.use("/api/user", authRouter)
-
-//ROUTES
-app.get("/", (req, res) => {
-    res.send("We are on home")
-})
+app.use("/api/events", eventRouter)
 
 
 //connect to db
