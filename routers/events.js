@@ -7,9 +7,22 @@ const verify = require("./verifyToken");
 
 //Joi Validation
 
-const {createEventValidation} = require("../validation/validation")
+const {createEventValidation, patchEventValidation, participateEventValidation} = require("../validation/validation")
 
 //Get Event by String
+
+//Get all public
+
+router.get("/public", async (req, res) => {
+  
+  try {
+    const publicEvents = await Event.find({public: true})
+    res.status(200).send(publicEvents)
+  } catch(err) {
+    res.status(500).json({message: err.message})
+  }
+
+})
 
 router.get("/:id", async (req, res) => {
   body = req.body
@@ -48,7 +61,8 @@ router.post("/", verify, async (req, res) => {
       eventDate: body.eventDate,
       eventDescription: body.eventDescription,
       eventLocation: body.eventLocation,
-      eventPrice: body.eventPrice
+      eventPrice: body.eventPrice,
+      public: body.public,
     })
   
     try {
@@ -61,10 +75,15 @@ router.post("/", verify, async (req, res) => {
 
 });
 
-//Update Event, you have to send both location and
-//description or they will be set to null
+//Update Event, you have to send location description and date
+
 router.patch("/:id", verify, async (req, res) => {
   const body = req.body
+
+  //validation with joi
+  const { error } = patchEventValidation(body)
+  if (error) return res.status(400).send(error.details[0].message)
+
   const getEvent = await Event.findOne({_id: req.params.id})
   try {
     if (req.user._id == getEvent.organizerID) {
@@ -80,6 +99,11 @@ router.patch("/:id", verify, async (req, res) => {
 
 //Patch Event (adding participants)
 router.patch("/participate/:id", async (req, res) => {
+  
+  //validation with joi
+  const { error } = participateEventValidation(req.body)
+  if (error) return res.status(400).send(error.details[0].message)
+  
   id = req.params.id
   const newParticipant = {name: req.body.name, email: req.body.email, note: req.body.note}
 
@@ -115,5 +139,4 @@ module.exports = router;
 
 //release canvas 2
 confirm/delete participants
-get all public events
 */
