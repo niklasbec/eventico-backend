@@ -18,7 +18,6 @@ app.use("/api/events", eventRouter)
 
 
 //connect to db
-
 mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true }, () => console.log("Connected to DB"))
 
 //starts the server

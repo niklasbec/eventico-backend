@@ -1,5 +1,22 @@
 const mongoose = require("mongoose")
 
+const userSchema = mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        min: 4
+    },
+    email: {
+        type: String,
+        max: 255,
+        min: 6
+    },
+    note: {
+        type: String,
+        max: 255,
+    }
+})
+
 const eventSchema = mongoose.Schema({
     title: {
         type: String,
@@ -19,10 +36,10 @@ const eventSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    // Still need to decide here how to save dates!
+    //FIX
     eventDate: {
-        type: String,
-        required: true,
+        type: Date,
+        default: Date.now()
     },
     eventDescription: {
         type: String,
@@ -37,7 +54,23 @@ const eventSchema = mongoose.Schema({
     eventPrice: {
         type: Number,
         default: 0,
-    }
+    },
+    participants: [{
+        name: {
+            type: String,
+            required: true,
+            min: 4
+        },
+        email: {
+            type: String,
+            max: 255,
+            min: 6
+        },
+        note: {
+            type: String,
+            max: 255,
+        }
+    }]
 })
 
 module.exports = mongoose.model("Event", eventSchema)

@@ -49,7 +49,7 @@ router.post("/login", async (req, res) => {
     if(!validPass) return res.status(400).send("Invalid password")
 
     //Create JWT
-    const token = jwt.sign({_id: user.id /*Data we want to provide frontend with*/}, process.env.JWT_SECRET)
+    const token = jwt.sign({_id: user.id, name: user.name, email: user.email /*Data we want to provide frontend with*/}, process.env.JWT_SECRET)
     res.header("jwt-token", token).send(token)
 
 
@@ -59,3 +59,14 @@ router.post("/login", async (req, res) => {
 
 
 module.exports = router;
+
+
+/*
+delete user
+patch email/name/password
+
+
+Release canvas 2:
+
+get all public events
+*/
