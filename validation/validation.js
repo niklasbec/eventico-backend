@@ -25,5 +25,17 @@ const loginValidation = data => {
     return valSchemaLogin.validate(data)
 }
 
+const createEventValidation = data => {
+
+    const valSchemaCreateEvent = Joi.object({
+        title: Joi.string().min(6).required(),
+        eventLocation: Joi.string().required()
+    })
+
+    return valSchemaCreateEvent.validate(data)
+}
+
+
 module.exports.registerValidation = registerValidation
 module.exports.loginValidation = loginValidation
+module.exports.createEventValidation = createEventValidation
