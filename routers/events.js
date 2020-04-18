@@ -61,24 +61,15 @@ router.post("/", verify, async (req, res) => {
 
 });
 
-//Update Event
-router.put("/:id", verify, async (req, res) => {
+//Update Event, you have to send both location and
+//description or they will be set to null
+router.patch("/:id", verify, async (req, res) => {
   const body = req.body
-  const getEvent = await Event.findOne({_id: id})
+  const getEvent = await Event.findOne({_id: req.params.id})
   try {
     if (req.user._id == getEvent.organizerID) {
-      const newData = await new Event({
-        title: body.title,
-        organizerID: req.user._id,
-        organizerName: req.user.name,
-        organizerContact: req.user.email,
-        eventDate: body.eventDate,
-        eventDescription: body.eventDescription,
-        eventLocation: body.eventLocation,
-        eventPrice: body.eventPrice
-      })
-      const updated = await Event.replaceOne({_id: id}, newData)
-      res.status(204).json({updated: updated });
+      const updated = await Event.update({_id: req.params.id}, {$set: {eventDescription: req.body.eventDescription, eventLocation: req.body.eventLocation}})
+      res.status(202).json({updated: updated });
     } else {
       res.status(400).json({message: "Not authed!"})
     }
@@ -121,8 +112,6 @@ module.exports = router;
 
 
 /*
-patch event description
-
 
 //release canvas 2
 confirm/delete participants
