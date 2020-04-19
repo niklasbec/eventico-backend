@@ -29,7 +29,8 @@ const patchUserValidation = data => {
 
     const valSchemaPatchEvent = Joi.object({
         name: Joi.string().min(4).required(),
-        email: Joi.string().min(6).required().email()
+        email: Joi.string().min(6).required().email(),
+        password: Joi.string().min(6).required()
 
     })
 

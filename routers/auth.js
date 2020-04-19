@@ -69,7 +69,7 @@ router.patch("/:id", verify, async (req, res) => {
   const { error } = patchUserValidation(req.body)
   if (error) return res.status(400).send(error.details[0].message)
 
-  const updatedUser = { name: req.body.name, email: req.body.email, passowrd: req.body.password }
+  const updatedUser = { name: req.body.name, email: req.body.email, password: req.body.password }
 
   try {
     const user = await User.findOne({ _id: req.params.id })
@@ -86,7 +86,6 @@ router.patch("/:id", verify, async (req, res) => {
 
 
 // Delete
-
 router.delete("/:id", verify, async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.params.id })
