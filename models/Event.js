@@ -21,7 +21,7 @@ const eventSchema = mongoose.Schema({
     title: {
         type: String,
         required: true,
-        min: 5,
+        min: 7,
         max: 100,
     },
     organizerID: {

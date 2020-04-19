@@ -25,10 +25,22 @@ const loginValidation = data => {
     return valSchemaLogin.validate(data)
 }
 
+const patchUserValidation = data => {
+
+    const valSchemaPatchEvent = Joi.object({
+        name: Joi.string().min(4).required(),
+        email: Joi.string().min(6).required().email(),
+        password: Joi.string().min(6).required()
+
+    })
+
+    return valSchemaPatchEvent.validate(data)
+}
+
 const createEventValidation = data => {
 
     const valSchemaCreateEvent = Joi.object({
-        title: Joi.string().min(6).required(),
+        title: Joi.string().min(7).required(),
         eventLocation: Joi.string().required(),
         public: Joi.bool(),
         eventDate: Joi.date(),
@@ -63,8 +75,10 @@ const participateEventValidation = data => {
     return valSchemaParticipateEvent.validate(data)
 }
 
+
 module.exports.registerValidation = registerValidation
 module.exports.loginValidation = loginValidation
+module.exports.patchUserValidation = patchUserValidation
 module.exports.createEventValidation = createEventValidation
 module.exports.patchEventValidation = patchEventValidation
 module.exports.participateEventValidation = participateEventValidation

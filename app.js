@@ -7,12 +7,11 @@ require("dotenv/config")
 app.use(express.json());
 
 //Import routes
-const postsRouter = require("./routers/posts")
 const authRouter = require("./routers/auth")
 const eventRouter = require("./routers/events")
 
 //Middlewares
-app.use("/api/posts", postsRouter) //router middleware
+//router middleware
 app.use("/api/user", authRouter)
 app.use("/api/events", eventRouter)
 
