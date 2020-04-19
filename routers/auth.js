@@ -5,21 +5,21 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
 //import validation
-const {registerValidation, loginValidation} = require("../validation/validation")
+const { registerValidation, loginValidation } = require("../validation/validation")
 
 router.post("/register", async (req, res) => {
 
-    //validation with joi
-    const { error } = registerValidation(req.body)
-    if (error) return res.status(400).send(error.details[0].message)
+  //validation with joi
+  const { error } = registerValidation(req.body)
+  if (error) return res.status(400).send(error.details[0].message)
 
-    //Check if email is unique
-    const emailExist = await User.findOne({email: req.body.email})
-    if(emailExist) return res.status(400).send("Email already exists, please login or use a different email.")
+  //Check if email is unique
+  const emailExist = await User.findOne({ email: req.body.email })
+  if (emailExist) return res.status(400).send("Email already exists, please login or use a different email.")
 
-    //Hashing Password
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(req.body.password, salt)
+  //Hashing Password
+  const salt = await bcrypt.genSalt(10)
+  const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
   const user = new User({
     name: req.body.name,
@@ -28,44 +28,73 @@ router.post("/register", async (req, res) => {
   });
   try {
     const savedUser = await user.save();
-    res.send({user: savedUser._id})
-  } catch(err) {
+    res.send({ user: savedUser._id })
+  } catch (err) {
     res.status(400).send(err);
   }
 });
 
 // Login
 router.post("/login", async (req, res) => {
-    //validation with joi
-    const { error } = loginValidation(req.body)
-    if (error) return res.status(400).send(error.details[0].message)
+  //validation with joi
+  const { error } = loginValidation(req.body)
+  if (error) return res.status(400).send(error.details[0].message)
 
-    //Check if email is in system
-    const user = await User.findOne({email: req.body.email})
-    if(!user) return res.status(400).send("Email doesn't exist!")
+  //Check if email is in system
+  const user = await User.findOne({ email: req.body.email })
+  if (!user) return res.status(400).send("Email doesn't exist!")
 
-    //Password check
-    const validPass = await bcrypt.compare(req.body.password, user.password)
-    if(!validPass) return res.status(400).send("Invalid password")
+  //Password check
+  const validPass = await bcrypt.compare(req.body.password, user.password)
+  if (!validPass) return res.status(400).send("Invalid password")
 
-    //Create JWT
-    const token = jwt.sign({_id: user.id, name: user.name, email: user.email /*Data we want to provide frontend with*/}, process.env.JWT_SECRET)
-    res.header("jwt-token", token).send(token)
+  //Create JWT
+  const token = jwt.sign({ _id: user.id, name: user.name, email: user.email /*Data we want to provide frontend with*/ }, process.env.JWT_SECRET)
+  res.header("jwt-token", token).send(token)
 
 
-    res.send("Successfully logged in")
+  res.send("Successfully logged in")
+
+})
+
+// Patch User (email/name/password)
+router.patch("/:id", async (req, res) => {
+  const id = req.params.id;
+  const updatedUser = { name: req.body.name, email: req.body.email, passowrd: req.body.password }
+
+  try {
+    const user = await User.findOne({ _id: id })
+    if (!user) {
+      res.status(404).json({ message: "Incorrect User ID" })
+    } else {
+      res.status(201).json({ message: "Update successful" })
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+
 
 })
 
 
+// Delete
+
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const deleted = await User.findOne({ _id: id })
+    res.status(202).json({ message: deleted })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+
+
+
 module.exports = router;
 
-
 /*
-delete user
-patch email/name/password
-
-
 Release canvas 2:
 
 get all public events
