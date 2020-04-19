@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
 //import validation
-const { registerValidation, loginValidation } = require("../validation/validation")
+const { registerValidation, loginValidation, patchUserValidation } = require("../validation/validation")
 const verify = require("./verifyToken");
 
 router.post("/register", async (req, res) => {
@@ -66,6 +66,9 @@ router.post("/login", async (req, res) => {
 // Patch User (email/name/password)
 router.patch("/:id", verify, async (req, res) => {
 
+  const { error } = patchUserValidation(req.body)
+  if (error) return res.status(400).send(error.details[0].message)
+
   const updatedUser = { name: req.body.name, email: req.body.email, passowrd: req.body.password }
 
   try {
@@ -73,7 +76,7 @@ router.patch("/:id", verify, async (req, res) => {
     if (!user) {
       res.status(404).json({ message: "Incorrect User ID" })
     } else {
-      const updated = await User.update({ _id: req.params.id }, { $set: { updatedUser } })
+      const updated = await User.updateOne({ _id: req.params.id }, { $set: { name: updatedUser.name, email: updatedUser.email, password: updatedUser.password } })
       res.status(201).json({ message: "Update successful" })
     }
   } catch (err) {
@@ -85,10 +88,14 @@ router.patch("/:id", verify, async (req, res) => {
 // Delete
 
 router.delete("/:id", verify, async (req, res) => {
-
   try {
-    const deleted = await User.findOne({ _id: req.params.id })
-    res.status(202).json({ message: deleted })
+    const user = await User.findOne({ _id: req.params.id })
+    if (!user) {
+      res.status(404).json({ message: "Incorrect User ID" })
+    } else {
+      const deleted = await User.deleteOne({ _id: req.params.id })
+      res.status(202).json({ message: "User deleted successfully" })
+    }
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
