@@ -60,6 +60,7 @@ router.post("/login", async (req, res) => {
 // Patch User (email/name/password)
 router.patch("/:id", async (req, res) => {
   const id = req.params.id;
+
   const updatedUser = { name: req.body.name, email: req.body.email, passowrd: req.body.password }
 
   try {
@@ -67,13 +68,12 @@ router.patch("/:id", async (req, res) => {
     if (!user) {
       res.status(404).json({ message: "Incorrect User ID" })
     } else {
+      const updated = User.updateOne({ _id: id }, { $set: { updatedUser } })
       res.status(201).json({ message: "Update successful" })
     }
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
-
-
 })
 
 
