@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const Event = require("../models/Event");
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
@@ -69,7 +70,10 @@ router.patch("/:id", verify, async (req, res) => {
   const { error } = patchUserValidation(req.body)
   if (error) return res.status(400).send(error.details[0].message)
 
-  const updatedUser = { name: req.body.name, email: req.body.email, password: req.body.password }
+  const salt = await bcrypt.genSalt(10)
+  const hashedPassword = await bcrypt.hash(req.body.password, salt)
+
+  const updatedUser = { name: req.body.name, email: req.body.email, password: hashedPassword }
 
   try {
     const user = await User.findOne({ _id: req.params.id })
@@ -86,13 +90,14 @@ router.patch("/:id", verify, async (req, res) => {
 
 
 // Delete
-router.delete("/:id", verify, async (req, res) => {
+router.delete("/deleteAccount", verify, async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.params.id })
+    const user = await User.findOne({ _id: req.user._id })
     if (!user) {
       res.status(404).json({ message: "Incorrect User ID" })
     } else {
-      const deleted = await User.deleteOne({ _id: req.params.id })
+      const events = await Event.deleteMany({ organizerID: req.user._id })
+      const deleted = await User.deleteOne({ _id: req.user._id })
       res.status(202).json({ message: "User deleted successfully" })
     }
   } catch (err) {

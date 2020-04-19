@@ -40,7 +40,7 @@ const patchUserValidation = data => {
 const createEventValidation = data => {
 
     const valSchemaCreateEvent = Joi.object({
-        title: Joi.string().min(6).required(),
+        title: Joi.string().min(7).required(),
         eventLocation: Joi.string().required(),
         public: Joi.bool(),
         eventDate: Joi.date(),
